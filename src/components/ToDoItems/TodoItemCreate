@@ -1,0 +1,115 @@
+import React, { useState, useRef } from "react";
+import { Form, Button, Card } from "react-bootstrap";
+import sampleTodoItem from '../../Utilities/sampleTodoItem';
+
+
+export default function TodoItemCreate(props) {
+  const nameRef = useRef();
+  const descRef = useRef();
+  const urlRef = useRef();
+  const linkTextRef = useRef();
+  const catRef = useRef();
+
+  const [valSummary, setValSummary] = useState(" ");
+  const [nameVal, setNameVal] = useState(" ");
+  const [urlVal, setUrlVal] = useState(" ");
+  const [linkTextVal, setLinkTextVal] = " ";
+  const [descVal, setDescVal] = useState(" ");
+
+    const validate = (resource) => {
+        let name = resource.Name
+        let desc = resource.Description
+        let url = resource.Url
+        let linkText = resource.LinkText
+
+        //name validation
+        name.length > 25 ? setNameVal(' ** Max 25 Characters ') : setNameVal
+        ('')
+
+        //url validation
+        url.length > 75 ? setUrlVal(' ** Max 75 Characters ') : setUrlVal
+        ('')
+
+        //linklength validation
+        linkText.length > 25 ? setLinkTextVal(' ** Max 25 Characters ') : setLinkTextVal
+        ('')
+
+        //desc validation
+        desc.length > 50 ? setDescVal(' ** Max 50 Characters ') : setDescVal
+        ('')
+    }
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+
+    const resource = {
+        Name: nameRef.current.value,
+        Description: descRef.current.value,
+        Url: urlRef.current.value,
+        LinkText: linkTextRef.current.value,
+        CategoryId: catRef.current.value
+    }
+
+    //Validate the resource
+    validate(resource);
+
+    //if validation passes, all of the objects will have empty strings
+    if(nameVal === '' && urlVal === '' && linkTextVal === '' && descVal === ''){
+      props.addResource(resource);  
+    }
+    else{
+        setValSummary('Correct the inputs below to submit the resource.')
+    }
+
+    
+  }
+
+  return (
+    <article className="createResource m-2 text-white align-items-center">
+      <Card bg="dark">
+        <Card.Body>
+          <Form onSubmit={handleSubmit}>
+            <h1 className="m-2">Create New Resource</h1>
+            <br />
+            {valSummary !== "" && (
+              <div className="alert alert-danger">
+                <strong>{valSummary}</strong>
+              </div>
+            )}
+            <Form.Group id="name" className="text-left">
+              <label>Name</label>
+              <Form.Control type="text" ref={nameRef} required />
+              <div className="text-danger">{nameVal}</div>
+            </Form.Group>
+            <Form.Group id="url" className="text-left">
+              <label>Url</label>
+              <Form.Control type="text" ref={urlRef} required />
+              <div className="text-danger">{urlVal}</div>
+            </Form.Group>
+            <Form.Group id="linkText" className="text-left">
+              <label>Link Text</label>
+              <Form.Control type="text" ref={linkTextRef} required />
+              <div className="text-danger">{linkTextVal}</div>
+            </Form.Group>
+            <Form.Group id="desc" className="text-left">
+              <label>Description</label>
+              <Form.Control as="textarea" type="text" ref={descRef} required />
+              <div className="text-danger">{descVal}</div>
+            </Form.Group>
+            <Form.Group id="cat" className="text-left">
+              <label>Category</label>
+              <select className="form-control" ref={catRef} required>
+                {props.categories.map(cat => 
+                    <option key={cat.CategoryId} value={cat.CategoryId}>
+                        {cat.CategoryName}
+                    </option>
+                    )}
+              </select>
+            </Form.Group>
+            <button type="submit" className="btn btn-info w-100">Submit</button>
+          </Form>
+        </Card.Body>
+      </Card>
+    </article>
+  );
+}
